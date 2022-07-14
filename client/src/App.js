@@ -3,6 +3,7 @@ import './App.css';
 import Collapsible from 'react-collapsible';
 import * as lists from './modules/Generic/BilletBank';
 import MilpacParse from './modules/Generic/MilpacParse';
+import { PieChart } from 'react-minimal-pie-chart';
 
 function MilpacRequest () {
 
@@ -12,8 +13,8 @@ function MilpacRequest () {
   useEffect(() => {
       async function fetchMilpacList() {
           try {
-              const requestUrl = 'https://bff.adr.7cav.us/roster/combat'
-              //const requestUrl = 'http://localhost:4000/roster/combat'
+              //const requestUrl = 'https://bff.adr.7cav.us/roster/combat'
+              const requestUrl = 'http://localhost:4000/roster/combat'    //Use this for local hosting
               const response = await fetch (requestUrl);
               const responseJSON = await response.json();
               setMilpacList(responseJSON);
@@ -27,8 +28,8 @@ function MilpacRequest () {
   useEffect(() => {
     async function fetchReserveList() {
         try {
-            const requestUrl = 'https://bff.adr.7cav.us/roster/reserves'
-            //const requestUrl = 'http://localhost:4000/roster/reserves'
+            //const requestUrl = 'https://bff.adr.7cav.us/roster/reserves'
+            const requestUrl = 'http://localhost:4000/roster/reserves'    //Use this for local hosting
             const response = await fetch (requestUrl);
             const responseJSON = await response.json();
             setReserveList(responseJSON);
@@ -44,6 +45,30 @@ function MilpacRequest () {
     "combat": milpacList,
     "reserve": reserveList,
   })
+
+  var count = []
+
+  var activePromise = new Promise ((resolve, reject) => {
+    var activePromiseCount = Object.keys(milpacArray[0].combat.profiles).length;
+    resolve(activePromiseCount)
+  });
+
+  var reservePromise = new Promise ((resolve, reject) => {
+    var reservePromiseCount = Object.keys(milpacArray[0].reserve.profiles).length;
+    resolve(reservePromiseCount)
+  }); 
+
+  activePromise.then((activePromiseCount) => {
+    count.push(activePromiseCount);
+  });
+
+  reservePromise.then((reservePromiseCount) => {
+    count.push(reservePromiseCount)
+  }); 
+
+  console.log(count)
+ // console.log(reserveCount)
+
 
   return(
   <div className='MasterContainer'>
@@ -183,6 +208,14 @@ function MilpacRequest () {
           </div>
         </Collapsible>
       </div>
+    </div>
+    <div>
+    <PieChart
+      data={[
+        { title: 'One', value: count[0], color: '#E38627' },
+        { title: 'Two', value: count[1], color: '#C13C37' },
+      ]}
+    />;
     </div>
   </div> 
   )
